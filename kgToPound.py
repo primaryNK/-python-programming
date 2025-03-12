@@ -1,16 +1,17 @@
 import tkinter
 from tkinter import ttk
 import time
+import random
 
 main_window = tkinter.Tk()
-main_window.title("inch to cm")
+main_window.title("kg to pound")
 
 tab = ttk.Notebook(main_window)
 
 main_tab = ttk.Frame(tab)
-tab.add(main_tab, text="inch to cm")
+tab.add(main_tab, text="kg to pound")
 
-lable1 = ttk.Label(main_tab, text="Enter inch:")
+lable1 = ttk.Label(main_tab, text="Enter kg:")
 lable1.grid(row=0, column=0)
 
 entry = ttk.Entry(main_tab)
@@ -32,9 +33,14 @@ def convert():
         return
     else:
         try:
-            inch = float(input)
-            cm = inch * 2.54
-            result_label.config(text=f"{cm:.2f} cm")
+            if random.randint(0, 5) == 0:
+                result_label.config(text="WTF IS KILLOGRAM 🦅")
+                return
+            else:
+                kg = float(input)
+                pound = kg * 2.20462
+                result_label.config(text=f"{pound:.2f} pounds")
+                return
         except ValueError:
             result_label.config(text="Value Error")
 
