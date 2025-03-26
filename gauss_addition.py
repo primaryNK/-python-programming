@@ -35,7 +35,6 @@ def select():
         result_label.config(text="")
         label2.grid(row=2, column=0)
         entry1.grid(row=2, column=1)
-
         
     elif selected == "입력한 두 수 사이의 합계":
         label2.grid_forget()
@@ -55,8 +54,6 @@ def safe_eval(input):
     else:
         return "no input"
     
-        
-
 def fomula():
     try:
         fomula = entry1.get()
