@@ -13,7 +13,7 @@ tab.add(main_tab, text="Gauss Addition")
 label1 =  ttk.Label(main_tab, text="Select input: ")
 label1.grid(row=0, column=0)
 
-selection = ttk.Combobox(main_tab, values=["입력한 수식 계산", "입력한 두 수 사이의 합계"])
+selection = ttk.Combobox(main_tab, values=["입력한 수식 계산", "입력한 두 수 사이의 합계"], state="readonly")
 selection.grid(row=0, column=1)
 
 label2 = ttk.Label(main_tab, text="수식을 입력하세요: ")
@@ -52,7 +52,7 @@ def safe_eval(input):
         except:
             return None
     else:
-        return "error"
+        return "Error"
     
 def fomula():
     try:
