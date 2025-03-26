@@ -52,7 +52,7 @@ def safe_eval(input):
         except:
             return None
     else:
-        return "no input"
+        return "error"
     
 def fomula():
     try:
