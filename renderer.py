@@ -2,31 +2,44 @@ import pygame
 import math
 import random
 
+
 WIDTH, HEIGHT = 800, 600
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Custom 3D Renderer with Player Controls")
 
-player_x, player_y, player_z = 0, 1, -5 
-player_yaw, player_pitch = 0, 0 
-jump_velocity = 0.5
-player_velocity_y = 0
-gravity = -0.02
-speed = 0.1
-sensitivity = 0.2
-
-keys = {}
+class Player:
+    def __init__(self, x, y, z, yaw, pitch):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.yaw = yaw
+        self.pitch = pitch
+        self.velocity_y = 0
+        self.on_ground = True
+        self.gravity = -0.02
+        self.jump_velocity = 0.5
+        self.speed = 0.1
+        self.sensitivity = 0.2
+    
+    def player_coordiates(x,y,z,yaw,pitch):
+        x = x
+        y = y
+        z = z
+        yaw = yaw
+        pitch = pitch
+    
 
 def project(x, y, z):
-    dx = x - player_x
-    dy = y - player_y
-    dz = z - player_z
+    dx = x - Player.x
+    dy = y - Player.y
+    dz = z - Player.z
 
-    rad_yaw = math.radians(player_yaw)
+    rad_yaw = math.radians(Player.player_yaw)
     transformed_x = dx * math.cos(rad_yaw) - dz * math.sin(rad_yaw)
     transformed_z = dx * math.sin(rad_yaw) + dz * math.cos(rad_yaw)
 
-    rad_pitch = math.radians(player_pitch)
+    rad_pitch = math.radians(Player.player_pitch)
     transformed_y = dy * math.cos(rad_pitch) - transformed_z * math.sin(rad_pitch)
     transformed_z = dy * math.sin(rad_pitch) + transformed_z * math.cos(rad_pitch)
 
@@ -46,85 +59,92 @@ def draw_line(x1, y1, z1, x2, y2, z2, color=(255, 255, 255)):
     if p1 and p2:
         pygame.draw.line(screen, color, p1, p2, 2)
 
-def update_movement():
-    global player_x, player_y, player_z, player_yaw ,player_pitch, player_velocity_y, on_ground
+def draw_visible_box_edges(x, y, z, width, height, depth, color=(255, 255, 255)):
+    # 상자의 8개 꼭짓점 좌표 계산
+    vertices = [
+        (x, y, z),  # front-bottom-left
+        (x + width, y, z),  # front-bottom-right
+        (x, y + height, z),  # front-top-left
+        (x + width, y + height, z),  # front-top-right
+        (x, y, z + depth),  # back-bottom-left
+        (x + width, y, z + depth),  # back-bottom-right
+        (x, y + height, z + depth),  # back-top-left
+        (x + width, y + height, z + depth),  # back-top-right
+    ]
 
-    rad_yaw = math.radians(player_yaw)
-    if keys.get(pygame.K_w, False):
-        player_x += math.sin(rad_yaw) * speed
-        player_z += math.cos(rad_yaw) * speed
-    if keys.get(pygame.K_s, False):
-        player_x -= math.sin(rad_yaw) * speed
-        player_z -= math.cos(rad_yaw) * speed
-    if keys.get(pygame.K_a, False):
-        player_x -= math.cos(rad_yaw) * speed
-        player_z += math.sin(rad_yaw) * speed
-    if keys.get(pygame.K_d, False):
-        player_x += math.cos(rad_yaw) * speed
-        player_z -= math.sin(rad_yaw) * speed
-    
-    if keys.get(pygame.K_SPACE, False) and on_ground:
-        player_velocity_y = jump_velocity
-        on_ground = False
+    # 각 면의 꼭짓점 인덱스 (시계 방향)
+    edges = [
+        (0, 1), (1, 3), (3, 2), (2, 0),  # front edges
+        (4, 5), (5, 7), (7, 6), (6, 4),  # back edges
+        (0, 4), (1, 5), (2, 6), (3, 7),  # connecting edges
+    ]
 
-    player_y += player_velocity_y
-    player_velocity_y += gravity
-
-
-    if player_y <= 1:  
-        player_y = 1
-        player_velocity_y = 0
-        on_ground = True
+    # 보이는 모서리만 그리기
+    for edge in edges:
+        draw_line(
+            vertices[edge[0]][0], vertices[edge[0]][1], vertices[edge[0]][2],
+            vertices[edge[1]][0], vertices[edge[1]][1], vertices[edge[1]][2],
+            color
+        )
 
 
-def handle_mouse_motion():
-    global player_yaw, player_pitch
-    mx, my = pygame.mouse.get_pos()
-    center_x, center_y = WIDTH // 2, HEIGHT // 2
 
-    player_yaw += (mx - center_x) * sensitivity
-    player_pitch += (center_y - my) * sensitivity
+# MAZE_SIZE = 10
+# maze = [[random.choice([0, 1]) for _ in range(MAZE_SIZE)] for _ in range(MAZE_SIZE)]
+# maze[0][0] = 0
+# maze[MAZE_SIZE-1][MAZE_SIZE-1] = 0
 
-    player_pitch = max(-80, min(80, player_pitch))
+# def draw_maze_with_depth():
+#     # 박스를 Z값(깊이) 기준으로 정렬
+#     boxes = []
+#     for x in range(MAZE_SIZE):
+#         for z in range(MAZE_SIZE):
+#             if maze[x][z] == 1:
+#                 # 중심점의 Z값 계산
+#                 center_z = z + 0.5
+#                 boxes.append((center_z, x, z))
 
-    pygame.mouse.set_pos([center_x, center_y]) 
+#     # Z값 기준으로 정렬 (가까운 Z값이 먼저 그려지도록 내림차순 정렬)
+#     boxes.sort(reverse=True, key=lambda box: box[0])
 
-MAZE_SIZE = 10
-maze = [[random.choice([0, 1]) for _ in range(MAZE_SIZE)] for _ in range(MAZE_SIZE)]
-maze[0][0] = 0
-maze[MAZE_SIZE-1][MAZE_SIZE-1] = 0
+#     # 정렬된 순서대로 박스 그리기
+#     for _, x, z in boxes:
+#         draw_visible_box_edges(x, 0, z, 1, 2, 1, color=(255, 255, 255))
 
-def draw_maze():
-    for x in range(MAZE_SIZE):
-        for z in range(MAZE_SIZE):
-            if maze[x][z] == 1:
-                draw_line(x, 0, z, x+1, 0, z) 
-                draw_line(x+1, 0, z, x+1, 1, z) 
-                draw_line(x+1, 1, z, x, 1, z) 
-                draw_line(x, 1, z, x, 0, z) 
+boxes = []
+
+def add_box(x, y, z, width, height, depth):
+    """
+    상자의 정보를 추가하는 함수.
+    :param x: 상자의 X 좌표
+    :param y: 상자의 Y 좌표
+    :param z: 상자의 Z 좌표
+    :param width: 상자의 너비
+    :param height: 상자의 높이
+    :param depth: 상자의 깊이
+    """
+    boxes.append((x, y, z, width, height, depth))
+
+def draw_boxes_with_depth():
+    """
+    Z값(깊이)을 기준으로 상자를 정렬한 뒤, 보이는 모서리만 렌더링하는 함수.
+    """
+    # Z값 기준으로 정렬 (가까운 Z값이 먼저 그려지도록 내림차순 정렬)
+    sorted_boxes = sorted(boxes, key=lambda box: box[2], reverse=True)
+
+    # 정렬된 순서대로 상자 그리기
+    for x, y, z, width, height, depth in sorted_boxes:
+        draw_visible_box_edges(x, y, z, width, height, depth, color=(255, 255, 255))
 
 
+# 예제: 상자 추가
+add_box(0, 0, 5, 1, 2, 1)  # (x, y, z, width, height, depth)
+add_box(2, 0, 7, 1, 2, 1)
+add_box(-1, 0, 10, 1, 2, 1)
 
 running = True
 pygame.event.set_grab(True)  
+pygame.mouse.set_visible(False)
+running = True
+pygame.event.set_grab(True)  
 pygame.mouse.set_visible(False)  
-
-while running:
-    screen.fill((0, 0, 0)) 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            keys[event.key] = True
-        elif event.type == pygame.KEYUP:
-            keys[event.key] = False
-
-    update_movement()
-    handle_mouse_motion()
-
-    draw_maze()
-
-    pygame.display.flip()  
-    pygame.time.delay(16)  
-
-pygame.quit()
