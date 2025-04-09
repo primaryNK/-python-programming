@@ -1,45 +1,26 @@
 import pygame
 import math
 import random
+import player
 
 
 WIDTH, HEIGHT = 800, 600
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Custom 3D Renderer with Player Controls")
-
-class Player:
-    def __init__(self, x, y, z, yaw, pitch):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.yaw = yaw
-        self.pitch = pitch
-        self.velocity_y = 0
-        self.on_ground = True
-        self.gravity = -0.02
-        self.jump_velocity = 0.5
-        self.speed = 0.1
-        self.sensitivity = 0.2
     
-    def player_coordiates(x,y,z,yaw,pitch):
-        x = x
-        y = y
-        z = z
-        yaw = yaw
-        pitch = pitch
-    
+Player = player.Player
 
 def project(x, y, z):
     dx = x - Player.x
     dy = y - Player.y
     dz = z - Player.z
 
-    rad_yaw = math.radians(Player.player_yaw)
+    rad_yaw = math.radians(Player.yaw)
     transformed_x = dx * math.cos(rad_yaw) - dz * math.sin(rad_yaw)
     transformed_z = dx * math.sin(rad_yaw) + dz * math.cos(rad_yaw)
 
-    rad_pitch = math.radians(Player.player_pitch)
+    rad_pitch = math.radians(Player.pitch)
     transformed_y = dy * math.cos(rad_pitch) - transformed_z * math.sin(rad_pitch)
     transformed_z = dy * math.sin(rad_pitch) + transformed_z * math.cos(rad_pitch)
 
@@ -136,15 +117,5 @@ def draw_boxes_with_depth():
     for x, y, z, width, height, depth in sorted_boxes:
         draw_visible_box_edges(x, y, z, width, height, depth, color=(255, 255, 255))
 
-
-# 예제: 상자 추가
-add_box(0, 0, 5, 1, 2, 1)  # (x, y, z, width, height, depth)
-add_box(2, 0, 7, 1, 2, 1)
-add_box(-1, 0, 10, 1, 2, 1)
-
-running = True
-pygame.event.set_grab(True)  
-pygame.mouse.set_visible(False)
-running = True
-pygame.event.set_grab(True)  
-pygame.mouse.set_visible(False)  
+def flip():
+    pygame.display.flip()
