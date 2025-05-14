@@ -40,6 +40,7 @@ def get_response(station_id, bus_route_type):
         print("Response as Dictionary:")
         print(response_dict)
     except ET.ParseError:
+        print(response.text)
         print("Error: Response is not in valid XML format.")
 
-get_response('01126', '2')
+get_response('01126', '1')
