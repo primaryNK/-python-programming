@@ -1,9 +1,12 @@
+import objects
 class PhysicalEngine:
+    physical_objects = []
+
     def __init__(self):
         self.physical_objects = []
 
-    def add_physical_object(self, obj):
-        self.physical_objects.append(obj)
+    def add_physical_object(self, x, y, z, box):
+        self.physical_objects.append({x, y, z, box})
 
     def update(self):
         for obj in self.physical_objects:

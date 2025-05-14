@@ -1,9 +1,11 @@
+import objects.box
 import physical_engine
 import graphics_engine
 import renderer
 import pygame
 import math
 import player
+import objects
 
 WIDTH, HEIGHT = 800, 600
     
@@ -35,11 +37,18 @@ def update_movement(keys):
     Player.y += Player.velocity_y
     Player.velocity_y += Player.gravity
 
-
     if Player.y <= 1:  
         Player.y = 1
         Player.velocity_y = 0
         Player.on_ground = True
+
+    for obj in physical_engine.PhysicalEngine.physical_objects:
+        if Player.x >= obj[0] and Player.x <= obj[0] + obj[3].height and Player.z >= obj[2] and Player.z <= obj[2] + obj[3].depth:
+            if Player.y >= obj[1] and Player[1] <= obj[1] + obj[3].height:
+                Player.y = obj[1] + obj[4].height
+                Player.velocity_y = 0
+                Player.on_ground = True
+                break
 
 def handle_mouse_motion():
     mx, my = pygame.mouse.get_pos()
@@ -61,9 +70,11 @@ clock = pygame.time.Clock()
 
 
 renderer.add_box(0, 0, 5, 1, 2, 1)  # (x, y, z, width, height, depth)
+physical_engine.PhysicalEngine.add_physical_object(physical_engine.PhysicalEngine, 0,0,5,objects.box.Box(1, 2, 1))
 renderer.add_box(2, 0, 7, 1, 2, 1)
+physical_engine.PhysicalEngine.add_physical_object(physical_engine.PhysicalEngine, 2, 0, 7, objects.box.Box(1, 2, 1))
 renderer.add_box(-1, 0, 10, 1, 2, 1)
-
+physical_engine.PhysicalEngine.add_physical_object(physical_engine.PhysicalEngine, -1, 0, 10, objects.box.Box(1, 2, 1))
 
 while running:
     for event in pygame.event.get():
