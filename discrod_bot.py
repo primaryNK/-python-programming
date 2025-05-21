@@ -1540,4 +1540,3 @@ async def on_command_error(ctx, error):
 
 
 print(f"treecommand: {bot.tree.get_commands()}")
-bot.run("")
