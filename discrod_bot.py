@@ -6,10 +6,9 @@ import sqlite3
 import hashlib
 import os
 import openpyxl
-import discord.enums
 import ast
 import re
-import gensim
+# import gensim
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
@@ -25,7 +24,7 @@ from discord.ext import tasks
 from datetime import datetime
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk import ngrams
-from gensim.models import Word2Vec
+# from gensim.models import Word2Vec
 from collections import Counter
 from collections import defaultdict
 from sklearn.manifold import TSNE
@@ -39,7 +38,7 @@ class CostomCommandTree(app_commands.CommandTree):
 intents = discord.Intents.all()
 intents.guilds = True
 client = discord.Client(intents= intents)
-openxl = openpyxl.load_workbook("nemobot-3.xlsx")
+openxl = openpyxl.load_workbook("discordbot.xlsx")
 bot = commands.Bot(command_prefix='!',intents=intents, tree_cls=CostomCommandTree)
 
 dt = datetime.now()
@@ -247,7 +246,6 @@ async def dailyset(ctx):
                    return
            else:
                return
-           await asyncio.sleep(3540)
                  
 @bot.command()
 async def role(ctx):
@@ -990,7 +988,8 @@ async def on_message(ctx):
 
     model_path = "chat model"
     if os.path.isfile(model_path):
-        model = gensim.models.Word2Vec.load(model_path)
+        pass
+        # model = gensim.models.Word2Vec.load(model_path)
 
     mention = [member.id for member in ctx.mentions]
     if (random.randrange(1,2) == 1 or (bot.user.id in mention)) and os.path.isfile(model_path) and ctx.type[1] == 0 and ctx.author.bot != True and (ctx.content[0].isalnum() or ctx.content[0] == '.' or ctx.content[0] == '@') and not 'http://' in ctx.content and not 'https://' in ctx.content:
@@ -1200,15 +1199,15 @@ async def on_message(ctx):
                         a_bigram = ast.literal_eval(a_bigram)
                         a_trigram = ast.literal_eval(a_trigram)
 
-                        # 키워드에 대해 유사단어 10개 유사도와 함께 리스트에 저장
-                        for keyword in word_list:
-                            if keyword in model.wv:
-                                similar_words = model.wv.most_similar(keyword, topn=10)
-                                for word, similarity in similar_words:
-                                    if word in word_similarities:
-                                        word_similarities[word] += similarity  # 겹치는 단어는 유사도 합산
-                                    else:
-                                        word_similarities[word] = similarity
+                        # # 키워드에 대해 유사단어 10개 유사도와 함께 리스트에 저장
+                        # for keyword in word_list:
+                        #     if keyword in model.wv:
+                        #         similar_words = model.wv.most_similar(keyword, topn=10)
+                        #         for word, similarity in similar_words:
+                        #             if word in word_similarities:
+                        #                 word_similarities[word] += similarity  # 겹치는 단어는 유사도 합산
+                        #             else:
+                        #                 word_similarities[word] = similarity
 
                     # 유사도가 가장 높은 10개 단어 선정
                     top_words = sorted(word_similarities, key=word_similarities.get, reverse=True)[:10]
@@ -1345,7 +1344,7 @@ async def train(ctx):
     columns = [column[0] for column in c.description]
     dict_rows = [dict(zip(columns, row)) for row in rows]
     print(dict_rows)
-    model = Word2Vec(vector_size=100, window=5, min_count=1, workers=4, sg=0)
+    # model = Word2Vec(vector_size=100, window=5, min_count=1, workers=4, sg=0)
 
     word_freq = Counter()
     sentences = []  # 모든 바이그램과 트라이그램을 저장할 리스트
@@ -1406,22 +1405,22 @@ async def train(ctx):
         print(f"trainmodel:{sentences}")
         print(f"word_freq: {word_freq}")
 
-    if word_freq:
-        model.build_vocab_from_freq(word_freq)
-    else:
-        await ctx.send("no vocabulary data available")
-    if sentences:
-        model.train(sentences, total_examples=model.corpus_count, epochs=model.epochs) 
-    else:
-        await ctx.send("no sentence data available")
-    model.save("chat model")
+    # if word_freq:
+    #     model.build_vocab_from_freq(word_freq)
+    # else:
+    #     await ctx.send("no vocabulary data available")
+    # if sentences:
+    #     model.train(sentences, total_examples=model.corpus_count, epochs=model.epochs) 
+    # else:
+    #     await ctx.send("no sentence data available")
+    # model.save("chat model")
     
-    if model.wv.key_to_index:
-        vocab = list(model.wv.key_to_index)
-        print(f"vocabraw{vocab}")
-        print(f"{[model.wv.key_to_index]}")
-        X = model.wv[vocab]
-        show_tsne(X, vocab)
+    # if model.wv.key_to_index:
+    #     vocab = list(model.wv.key_to_index)
+    #     print(f"vocabraw{vocab}")
+    #     print(f"{[model.wv.key_to_index]}")
+    #     X = model.wv[vocab]
+    #     show_tsne(X, vocab)
 
 
     # # 키워드 설정
@@ -1540,3 +1539,4 @@ async def on_command_error(ctx, error):
 
 
 print(f"treecommand: {bot.tree.get_commands()}")
+bot.run("TOKEN")
